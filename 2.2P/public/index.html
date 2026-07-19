@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Instant Math Calculator</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 40px;
+        }
+
+        .result-box {
+            margin-top: 10px;
+            font-weight: bold;
+            color: blue;
+        }
+
+        .error-box {
+            margin-top: 10px;
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Square Calculator</h1>
+    <label for="num">Enter a number:</label>
+    <input type="text" id="num">
+    <button onclick="calculateSquare()">Calculate Square</button>
+    <div id="squareResult" class="result-box"></div>
+
+    <hr>
+
+    <h1>Addition Calculator</h1>
+    <label for="numA">Enter first number (a):</label>
+    <input type="text" id="numA">
+    <br><br>
+    <label for="numB">Enter second number (b):</label>
+    <input type="text" id="numB">
+    <br><br>
+    <button onclick="calculateSum()">Calculate Sum</button>
+    <div id="addResult" class="result-box"></div>
+
+    <script>
+        // Function to fetch the square calculation from the server
+        async function calculateSquare() {
+            const num = document.getElementById('num').value;
+            const resultDiv = document.getElementById('squareResult');
+
+            try {
+                // Fetch sends the data in the URL background stream
+                const response = await fetch(`/square?num=${num}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    resultDiv.className = "error-box";
+                    resultDiv.innerText = data.error;
+                } else {
+                    resultDiv.className = "result-box";
+                    resultDiv.innerText = `Result: The square is ${data.result}`;
+                }
+            } catch (err) {
+                resultDiv.innerText = "Error connecting to server.";
+            }
+        }
+
+        // Function to fetch the addition calculation from the server
+        async function calculateSum() {
+            const a = document.getElementById('numA').value;
+            const b = document.getElementById('numB').value;
+            const resultDiv = document.getElementById('addResult');
+
+            try {
+                // Fetch sends both parameters seamlessly in the background URL
+                const response = await fetch(`/add?a=${a}&b=${b}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    resultDiv.className = "error-box";
+                    resultDiv.innerText = data.error;
+                } else {
+                    resultDiv.className = "result-box";
+                    resultDiv.innerText = `Result: The sum is ${data.result}`;
+                }
+            } catch (err) {
+                resultDiv.innerText = "Error connecting to server.";
+            }
+        }
+    </script>
+</body>
+
+</html>

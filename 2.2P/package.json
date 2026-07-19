@@ -1,0 +1,24 @@
+{
+  "name": "2.2p",
+  "version": "1.0.0",
+  "description": "Express web server and web page - experimenting with a simple end point.",
+  "homepage": "https://github.com/nmizzy42-ux/SIT725_s225209796#readme",
+  "bugs": {
+    "url": "https://github.com/nmizzy42-ux/SIT725_s225209796/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nmizzy42-ux/SIT725_s225209796.git"
+  },
+  "license": "MIT",
+  "author": "N Mqhum",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
