@@ -1,0 +1,33 @@
+{
+  "name": "4.2p",
+  "version": "1.0.0",
+  "description": "What Is Good Software?",
+  "homepage": "https://github.com/nmizzy42-ux/SIT725_s225209796#readme",
+  "bugs": {
+    "url": "https://github.com/nmizzy42-ux/SIT725_s225209796/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nmizzy42-ux/SIT725_s225209796.git"
+  },
+  "keywords": [
+    "Nodejs",
+    "Express",
+    "Materialize",
+    "HTML",
+    "JS",
+    "CSS"
+  ],
+  "license": "MIT",
+  "author": "N.Mqhum",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.9.1"
+  }
+}
