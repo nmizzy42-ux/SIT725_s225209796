@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Book Catalog</title>
+</head>
+
+<body>
+    <h1>Book Catalog</h1>
+    <div id="bookDisplay"></div>
+
+    <script>
+        const out = document.getElementById('bookDisplay');
+
+        function render(items) {
+            out.innerHTML = '';
+            if (!Array.isArray(items) || items.length === 0) {
+                out.textContent = 'No books found.';
+                return;
+            }
+            for (const it of items) {
+                const p = document.createElement('p');
+                const title = it.title || 'Unknown Title';
+                const author = it.author || 'Unknown Author';
+                p.innerHTML = `<strong>${title}</strong> by ${author}`;
+                out.appendChild(p);
+            }
+        }
+
+        async function fetchBooks() {
+            out.textContent = 'Loading...';
+            try {
+                const res = await fetch('/api/books');
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const body = await res.json();
+
+                // Safely extract data array from custom API structure
+                const books = body.data || [];
+                render(books);
+            } catch (err) {
+                console.error('Error fetching books:', err);
+                out.textContent = 'Error fetching book catalog.';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', fetchBooks);
+    </script>
+</body>
+
+</html>
