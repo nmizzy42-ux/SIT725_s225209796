@@ -1,0 +1,24 @@
+{
+  "name": "5.2C",
+  "version": "1.0.0",
+  "description": "MVC + DATABASE",
+  "homepage": "https://github.com/nmizzy42-ux/SIT725_s225209796#readme",
+  "bugs": {
+    "url": "https://github.com/nmizzy42-ux/SIT725_s225209796/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nmizzy42-ux/SIT725_s225209796.git"
+  },
+  "license": "MIT",
+  "author": "N.M",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "node.server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.9.1"
+  }
+}

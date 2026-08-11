@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Book Catalog</title>
+    <style>
+        .book-item {
+            cursor: pointer;
+            padding: 4px;
+            margin: 2px 0;
+            background: #eee;
+            width: fit-content;
+        }
+
+        .book-item:hover {
+            background: #ddd;
+        }
+
+        .details-container {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #000;
+            width: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Books Catalogue developed by s225209796</h1>
+    <p>Click the button below to get all available books from the server:</p>
+    <button id="getAllBtn">Get all Books</button>
+
+    <div id="listDisplay" style="margin-top: 15px;"></div>
+    <div id="detailsDisplay"></div>
+
+    <script>
+        const getAllBtn = document.getElementById('getAllBtn');
+        const listDisplay = document.getElementById('listDisplay');
+        const detailsDisplay = document.getElementById('detailsDisplay');
+
+        //Render book listing
+        function renderList(items) {
+            listDisplay.innerHTML = '';
+            detailsDisplay.innerHTML = ''; 
+
+            if (!Array.isArray(items) || items.length === 0) {
+                listDisplay.textContent = 'No books found.';
+                return;
+            }
+
+            items.forEach(it => {
+                const div = document.createElement('div');
+                div.className = 'book-item';
+
+                //Title Price Currency format
+                div.textContent = `${it.title} ${it.price} ${it.currency || 'AUD'}`;
+
+                //Clicking an item triggers the target endpoint logic
+                div.addEventListener('click', () => fetchBookDetails(it.id));
+                listDisplay.appendChild(div);
+            });
+        }
+
+        //Render solitary details block
+        function renderDetails(book) {
+            detailsDisplay.innerHTML = `
+                <div class="details-container">
+                    <p><strong>Title:</strong> ${book.title}</p>
+                    <p><strong>Author:</strong> ${book.author}</p>
+                    <p><strong>Year:</strong> ${book.year}</p>
+                    <p><strong>Genre:</strong> ${book.genre}</p>
+                    <p><strong>Summary:</strong> ${book.summary}</p>
+                    <p><strong>Price (AUD):</strong> ${book.price}</p>
+                </div>
+            `;
+        }
+
+        //API interaction 
+        async function fetchAllBooks() {
+            listDisplay.textContent = 'Loading...';
+            try {
+                const res = await fetch('/api/books');
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const body = await res.json();
+                renderList(body.data || []);
+            } catch (err) {
+                console.error(err);
+                listDisplay.textContent = 'Error fetching book list.';
+            }
+        }
+
+        async function fetchBookDetails(id) {
+            try {
+                const res = await fetch(`/api/books/${id}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const body = await res.json();
+                renderDetails(body.data);
+            } catch (err) {
+                console.error(err);
+                alert('Error loading single book details data.');
+            }
+        }
+
+        getAllBtn.addEventListener('click', fetchAllBooks);
+    </script>
+</body>
+
+</html>
