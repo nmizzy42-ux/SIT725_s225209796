@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Book Catalog</title>
+    <style>
+        .book-item {
+            cursor: pointer;
+            padding: 4px;
+            margin: 2px 0;
+            background: #eee;
+            width: fit-content;
+        }
+
+        .book-item:hover {
+            background: #ddd;
+        }
+
+        .details-container {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #000;
+            width: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Books Catalogue developed by s225209796</h1>
+    <p>Click the button below to get all available books from the server:</p>
+    <button id="getAllBtn">Get all Books</button>
+
+    <div id="listDisplay" style="margin-top: 15px;"></div>
+    <div id="detailsDisplay"></div>
+
+    <!-- Live Checkout Summary Interface -->
+    <div id="checkoutSummary" class="checkout-container" style="display: none;">
+        <h3>🧾 Checkout Order Receipt</h3>
+        <p>Items in Basket: <span id="cartCount">0</span></p>
+        <p><strong>Subtotal (Before Discount):</strong> $<span id="cartSubtotal">0.00</span></p>
+        <p id="discountNotice"></p>
+        <h2>Total (inc. GST): $<span id="orderFinalTotal">0.00</span></h2>
+    </div>
+
+    <div id="footer">Developed by s225209796 | Integrity-Check: 42</div>
+
+    <script>
+        const getAllBtn = document.getElementById('getAllBtn');
+        const listDisplay = document.getElementById('listDisplay');
+        const detailsDisplay = document.getElementById('detailsDisplay');
+        const checkoutSummary = document.getElementById('checkoutSummary');
+
+
+        //Track selected book prices to calculate total on the fly
+        const selectedPrices = [];
+
+        //Core Calculation Logic (Matches backend rule structure)
+        function calculateOrderTotal(prices) {
+            let subtotal = 0;
+            prices.forEach(p => { subtotal += parseFloat(p); });
+
+            let discountApplied = false;
+            //10% volume discount condition for 3 or more items
+            if (prices.length >= 3) {
+                subtotal *= 0.90;
+                discountApplied = true;
+            }
+
+            //Add 10% standard tax markup
+            const finalTotal = subtotal * 1.10;
+            return {
+                total: finalTotal.toFixed(2),
+                discountApplied: discountApplied
+            };
+        }
+
+        //Render book listing
+        function renderList(items) {
+            listDisplay.innerHTML = '';
+            detailsDisplay.innerHTML = '';
+
+            if (!Array.isArray(items) || items.length === 0) {
+                listDisplay.textContent = 'No books found.';
+                return;
+            }
+
+            items.forEach(it => {
+                const div = document.createElement('div');
+                div.className = 'book-item';
+
+                //Title Price Currency format
+                div.textContent = `${it.title} ${it.price} ${it.currency || 'AUD'}`;
+
+                //Clicking an item triggers the target endpoint logic
+                div.addEventListener('click', () => fetchBookDetails(it.id));
+                listDisplay.appendChild(div);
+            });
+        }
+
+        //Render solitary details block
+        function renderDetails(book) {
+            detailsDisplay.innerHTML = `
+                <div class="details-container">
+                    <p><strong>Title:</strong> ${book.title}</p>
+                    <p><strong>Author:</strong> ${book.author}</p>
+                    <p><strong>Year:</strong> ${book.year}</p>
+                    <p><strong>Genre:</strong> ${book.genre}</p>
+                    <p><strong>Summary:</strong> ${book.summary}</p>
+                    <p><strong>Price (AUD):</strong> ${book.price}</p>
+                </div>
+            `;
+        }
+
+        //API interaction 
+        async function fetchAllBooks() {
+            listDisplay.textContent = 'Loading...';
+            try {
+                const res = await fetch('/api/books');
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const body = await res.json();
+                renderList(body.data || []);
+            } catch (err) {
+                console.error(err);
+                listDisplay.textContent = 'Error fetching book list.';
+            }
+        }
+
+        async function fetchBookDetails(id) {
+            try {
+                const res = await fetch(`/api/books/${id}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const body = await res.json();
+                renderDetails(body.data);
+
+                //Add to basket calculation stack
+                selectedPrices.push(body.data.price);
+
+                //Process pricing structures
+                const receipt = calculateOrderTotal(selectedPrices);
+
+                //Calculate display subtotal
+                let rawSubtotal = 0;
+                selectedPrices.forEach(p => rawSubtotal += parseFloat(p));
+
+                //Reveal checkout container and bind textual context updates
+                checkoutSummary.style.display = 'block';
+                document.getElementById('cartCount').textContent = selectedPrices.length;
+                document.getElementById('cartSubtotal').textContent = rawSubtotal.toFixed(2);
+                document.getElementById('orderFinalTotal').textContent = receipt.total;
+
+                const noticeEl = document.getElementById('discountNotice');
+                if (receipt.discountApplied) {
+                    noticeEl.className = 'discount-active';
+                    noticeEl.textContent = '10% Bulk Discount Applied (3+ Books)!';
+                } else {
+                    noticeEl.className = 'discount-hint';
+                    noticeEl.textContent = `💡 Add ${3 - selectedPrices.length} more book(s) to unlock a 10% discount.`;
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert('Error loading single book details data.');
+            }
+        }
+
+        getAllBtn.addEventListener('click', fetchAllBooks);
+    </script>
+</body>
+
+</html>
